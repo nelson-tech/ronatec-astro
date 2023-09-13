@@ -1,0 +1,35 @@
+<script>
+  import fetchCurrentUser from "@/api/utils/fetch/currentUser"
+  import fetchCart from "@/api/utils/fetch/cart"
+
+  import $user from "@/stores/user"
+  import $authLoading from "@/stores/loading/auth"
+  import $cart from "@/stores/cart"
+  import $cartLoading from "@/stores/loading/cart"
+
+  const load = async () => {
+    // fetch user if undefined
+    if ($user.get() === undefined) {
+      $authLoading.set(true)
+      const user = await fetchCurrentUser()
+
+      // set user
+      $user.set(user)
+      $authLoading.set(false)
+    }
+
+    // fetch cart if undefined
+    if ($cart.get() === undefined) {
+      $cartLoading.set(true)
+
+      const cartData = await fetchCart()
+
+      // set cart
+      $cart.set(cartData)
+
+      $cartLoading.set(false)
+    }
+  }
+
+  document.addEventListener("astro:page-load", load)
+</script>

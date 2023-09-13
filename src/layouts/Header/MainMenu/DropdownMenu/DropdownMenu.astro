@@ -1,0 +1,57 @@
+---
+import type { MainMenuLink } from "@/api/types"
+import Dropdown from "@/components/Dropdown"
+
+interface Props {
+  menuItem: MainMenuLink[0]
+}
+
+const { menuItem } = Astro.props
+---
+
+<script>
+  class Dropdown extends HTMLElement {
+    constructor() {
+      super()
+
+      let open = false
+
+      const svg = this.querySelector("span")
+      const button = this.querySelector("button")
+
+      // Click outside
+      const outsideClickListener = (event: MouseEvent) => {
+        if (event.target && !this.contains(event.target as Node) && open) {
+          svgClose()
+        }
+      }
+
+      const svgOpen = () => {
+        open = true
+        svg?.classList.replace("rotate-0", "rotate-180")
+        button?.classList.add("bg-gray-100")
+        document.addEventListener("click", outsideClickListener)
+      }
+
+      const svgClose = () => {
+        open = false
+        svg?.classList.replace("rotate-180", "rotate-0")
+        button?.classList.remove("bg-gray-100")
+        document.removeEventListener("click", outsideClickListener)
+      }
+
+      this.addEventListener("click", () => {
+        open ? svgClose() : svgOpen()
+      })
+    }
+  }
+
+  customElements.define("dropdown-menu", Dropdown)
+</script>
+
+<dropdown-menu>
+  <Dropdown id={menuItem.id ?? ""}>
+    <slot name="button" slot="button" />
+    <slot name="panel" slot="panel" />
+  </Dropdown>
+</dropdown-menu>

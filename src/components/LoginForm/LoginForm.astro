@@ -1,0 +1,162 @@
+<script>
+  import login from "@/api/utils/login"
+  import $authLoading from "@/stores/loading/auth"
+  import $loginOpen from "@/stores/modals/login"
+  import createLoadingSpinner from "@/components/LoadingSpinner"
+  import createLockedIcon from "@/components/icons/LockClosed"
+
+  const loadingSpinner = createLoadingSpinner({ size: 5, color: "white" })
+  const lockIcon = createLockedIcon(
+    "h-5 w-5 text-gray-300 group-hover:text-white"
+  )
+
+  // Get wrappers and subscribe to click events
+
+  const registerLinkWrapper = document.getElementById("register-link-wrapper")
+
+  registerLinkWrapper?.addEventListener("click", () => {
+    $loginOpen.set(false)
+  })
+
+  const resetPasswordWrapper = document.getElementById("reset-password-wrapper")
+
+  resetPasswordWrapper?.addEventListener("click", () => {
+    $loginOpen.set(false)
+  })
+
+  // Handle redirect
+
+  const searchParams = new URLSearchParams(window.location.search)
+  const redirect = searchParams.get("redirect")
+
+  if (redirect) {
+    // Get the register link
+    const registerLink = registerLinkWrapper?.querySelector("a")
+
+    // Get the register link href
+    const registerLinkHref = registerLink?.getAttribute("href")
+
+    // Append redirect to register link href
+    if (registerLinkHref) {
+      registerLink?.setAttribute(
+        "href",
+        `${registerLinkHref}?redirect=${redirect}`
+      )
+    }
+  }
+
+  // Handle form submission
+
+  const form = document.getElementById("login-form")
+
+  $authLoading.subscribe((loading) => {
+    const submitButton = form?.querySelector("button[type=submit]")
+    if (submitButton) {
+      let submitIconWrapper = submitButton.querySelector("span")
+      if (loading) {
+        submitButton.setAttribute("disabled", "disabled")
+        submitIconWrapper?.replaceChildren(loadingSpinner)
+      } else {
+        submitButton.removeAttribute("disabled")
+        submitIconWrapper?.replaceChildren(lockIcon)
+      }
+    }
+  })
+
+  form?.addEventListener("submit", async (e) => {
+    const form = e.target as HTMLFormElement
+    // Prevent form submission
+    e.preventDefault()
+
+    // Get form data
+    const { email, password } = Object.fromEntries(new FormData(form)) as {
+      email: string
+      password: string
+    }
+
+    const loginData = await login({ email, password })
+  })
+</script>
+
+<div
+  class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+>
+  <div class="max-w-md w-full space-y-8">
+    <div>
+      <h2 class="text-center text-3xl font-extrabold text-gray-700">
+        Log in to your account
+      </h2>
+      <div class="mt-2 flex justify-center text-sm text-gray-600">
+        <div>
+          <span class="pr-0.5">Or</span>
+        </div>
+        <div id="register-link-wrapper">
+          <a
+            rel="prefetch-intent"
+            href="/register"
+            title="Click to register."
+            class="font-medium text-accent hover:text-highlight"
+          >
+            <span>click here to register</span>
+          </a>
+        </div>
+        <span>.</span>
+      </div>
+    </div>
+    <form id="login-form" class="mt-8 space-y-2" action="#" method="post">
+      <div class="-space-y-px">
+        <div>
+          <label class="sr-only">Email address</label>
+          <input
+            id="email-address"
+            name="email"
+            type="email"
+            autocomplete="email"
+            class="appearance-none relative block w-full px-3 py-2 border border-gray-300
+            placeholder-gray-500 text-gray-900 rounded-t
+            focus:outline-none focus:ring-accent focus:border-accent focus:z-10 sm:text-sm"
+            placeholder="Email address"
+          />
+        </div>
+        <div>
+          <label class="sr-only">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            class="appearance-none relative block w-full px-3 py-2 border border-gray-300
+            placeholder-gray-500 text-gray-900 rounded-b
+            focus:outline-none focus:ring-accent focus:border-accent focus:z-10 sm:text-sm"
+            placeholder="Password"
+          />
+        </div>
+      </div>
+
+      <div class="pt-2"></div>
+
+      <div class="text-sm text-center pt-2" id="reset-password-wrapper">
+        <a
+          href="/reset-password"
+          class="font-medium text-accent hover:text-highlight"
+          title="Reset your password."
+        >
+          Forgot your password?
+        </a>
+      </div>
+
+      <div class="pt-4">
+        <button
+          type="submit"
+          title="Click to sign in."
+          class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded text-white bg-accent hover:bg-highlight focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight"
+        >
+          <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+            <svg></svg>
+          </span>
+           Log in
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

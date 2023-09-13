@@ -1,0 +1,148 @@
+<script>
+  import alertStore, { type AlertType } from "@/stores/alert"
+  class CustomAlerts extends HTMLElement {
+    iconSize = "h-5 w-5"
+
+    icon: HTMLElement | null
+
+    constructor() {
+      super()
+
+      this.iconSize = this.dataset["icon-size"] ?? this.iconSize
+
+      this.icon = this.dataset.icon
+        ? document.createElement(this.dataset.icon)
+        : null
+
+      // set initial styling
+      this.style.opacity = "0"
+
+      alertStore.subscribe((alert) => {
+        if (alert.open) {
+          alert.open ? this.openAlert(alert) : this.closeAlert()
+        } else {
+        }
+      })
+    }
+
+    public setPanelStyles(alert: Partial<AlertType>) {
+      const basePanelClasses =
+        "relative my-2 max-w-sm w-full  shadow-lg rounded pointer-events-auto overflow-hidden"
+      const alertsPanel = document.getElementById("alerts-panel")
+
+      if (alertsPanel) {
+        switch (alert.kind) {
+          case "success":
+          case "info":
+            alertsPanel.setAttribute(
+              "class",
+              `${basePanelClasses} bg-green-50 text-green-600`
+            )
+            break
+          case "error":
+            alertsPanel.setAttribute(
+              "class",
+              `${basePanelClasses} bg-red-50 text-red-main`
+            )
+            break
+          case "warning":
+            alertsPanel.setAttribute(
+              "class",
+              `${basePanelClasses} bg-yellow-50 text-yellow-700`
+            )
+            break
+          default:
+            break
+        }
+      }
+    }
+
+    public openAlert(alert: Partial<AlertType>) {
+      this.setPanelStyles(alert)
+
+      // set icon
+      const icon = document.getElementById("alert-icon")
+      if (alert.icon) {
+        icon && icon.appendChild(alert.icon)
+        icon && icon.setAttribute("class", this.iconSize)
+      } else {
+        icon && icon.remove()
+      }
+
+      // set primary text
+      const primaryText = document.getElementById("alert-primary-text")
+      primaryText && (primaryText.textContent = alert.primary ?? "")
+
+      // set secondary text
+      const secondaryText = document.getElementById("alert-secondary-text")
+      secondaryText && (secondaryText.textContent = alert.secondary ?? "")
+
+      // bring alert to front
+      this.style.opacity = "1"
+      this.style.zIndex = "50"
+
+      // prep styles for outro
+      setTimeout(() => {
+        this.classList.replace("ease-out", "ease-in")
+      }, 1000)
+
+      // set timeout
+      setTimeout(() => {
+        this.closeAlert()
+      }, alert.timeout ?? 2000)
+    }
+
+    public closeAlert(e?: Event, callbackFn?: () => void) {
+      // hide alert
+      this.style.opacity = "0"
+      setTimeout(() => {
+        this.style.zIndex = "-1"
+
+        // prep styles for intro
+        this.classList.replace("ease-in", "ease-out")
+      }, 1000)
+    }
+  }
+  customElements.define("x-alerts", CustomAlerts)
+</script>
+
+<x-alerts
+  aria-live="assertive"
+  class="fixed inset-0 flex px-4 py-6 pointer-events-none sm:p-6 items-start transition-all duration-300 transform ease-out"
+>
+  <div class="w-full flex flex-col items-center space-y-4 sm:items-end">
+    <div id="alerts-panel" role="alert">
+      <div class="flex items-start p-4">
+        <div class="flex-shrink-0 mt-1">
+          <div id="alert-icon" aria-hidden="true"></div>
+        </div>
+        <div class="ml-3 w-0 flex-1 pt-0.5">
+          <h3 id="alert-primary-text" class="text-sm font-medium"></h3>
+          <p id="alert-secondary-text" class="mt-1 text-sm text-gray-400"></p>
+        </div>
+        <div class="ml-4 flex-shrink-0 flex"></div>
+      </div>
+      <button
+        id="alert-close-button"
+        class="cursor-pointer transition p-4 absolute top-0 right-0 hover:text-gray-900"
+        title="Close"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="h-5 w-5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          >
+          </path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</x-alerts>

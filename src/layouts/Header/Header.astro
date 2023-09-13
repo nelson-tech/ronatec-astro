@@ -1,0 +1,44 @@
+---
+import Logo from "./Logo"
+import Sticky from "./Sticky.astro"
+import MainMenu from "./MainMenu"
+import MobileNav from "./MobileNav"
+import UserNav from "./UserNav"
+
+// import MobileMenuButton from "./buttons/MobileMenu"
+// import SearchButton from "./buttons/Search"
+
+// const response = await fetch(import.meta.env.PUBLIC_API_BASE + "/globals/menus")
+
+// const menus = await response.json()
+
+const menus = await fetch(import.meta.env.PUBLIC_API_BASE + "/globals/menus")
+  .then((res) => res.json())
+  .catch((err) => console.error(err))
+---
+
+<Sticky>
+  <div
+    class="bg-white mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl h-16 flex items-center justify-between"
+  >
+    {/* Logo (lg+) */}
+    <div class="hidden lg:block lg:items-center">
+      <a href="/" class="text-accent">
+        <span class="sr-only">Ronatec C2C, Inc.</span>
+        <Logo />
+      </a>
+    </div>
+
+    <MainMenu menuItems={menus?.mainMenu.links} />
+
+    {/* Mobile menu and search (lg-) */}
+    <MobileNav />
+
+    {/* Logo (lg-) */}
+    <div class="lg:hidden">
+      <Logo />
+    </div>
+
+    <UserNav />
+  </div>
+</Sticky>

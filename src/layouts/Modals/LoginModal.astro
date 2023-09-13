@@ -1,0 +1,41 @@
+---
+import LoginForm from "@/components/LoginForm"
+---
+
+<script>
+  import CustomModal from "@/lib/classes/CustomModal"
+  import $loginOpen from "@/stores/modals/login"
+
+  class LoginModal extends CustomModal {
+    constructor() {
+      super()
+      $loginOpen.subscribe((open) => {
+        open ? this.openModal() : this.closeModal()
+      })
+    }
+
+    closeModal = () =>
+      super.closeModal(() => {
+        $loginOpen.set(false)
+      })
+  }
+
+  customElements.define("login-modal", LoginModal)
+</script>
+
+<login-modal
+  id="login-modal"
+  data-initial-panel-classes="opacity-0 transition-all duration-300 inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left bg-white align-middle shadow-xl rounded"
+  data-target="login-modal-overlay"
+  data-background-click="enabled"
+>
+  <dialog id="login-modal-overlay" hidden>
+    <div
+      id="login-modal-panel"
+      class="opacity-100 transition-all duration-300 inline-block w-full max-w-md p-6 my-8 \
+      overflow-hidden text-left bg-white align-middle shadow-xl rounded focus:outline-none"
+    >
+      <LoginForm />
+    </div>
+  </dialog>
+</login-modal>

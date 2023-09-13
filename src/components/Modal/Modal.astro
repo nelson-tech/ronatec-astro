@@ -1,0 +1,338 @@
+---
+interface Props {
+  initialModalClasses?: string
+  initialPanelClasses?: string
+  backgroundClick?: boolean
+  target: string
+  closingDelay?: number
+}
+
+const {
+  initialModalClasses,
+  initialPanelClasses,
+  backgroundClick = true,
+  target,
+  closingDelay = 300,
+} = Astro.props
+
+// TODO: improve scroll blocking
+---
+
+<script>
+  //   const closeModal = (config: {
+  //     modal: HTMLElement | null
+  //     modalContent: string | null | undefined
+  //     overlay: HTMLElement | null
+  //     modalFocusBackId: string | null | undefined
+  //     contentBackId: string | null | undefined
+  //     backgroundEnabled: string | null | undefined
+  //     fromId: string | null | undefined
+  //   }) => {
+  //     remove(config.modal)
+  //     remove(config.overlay)
+
+  //     if (config.contentBackId) {
+  //       let contentBack = findById(config.contentBackId)
+  //       if (contentBack?.innerHTML && config.modalContent) {
+  //         contentBack.innerHTML = config.modalContent
+  //       }
+  //     }
+
+  //     if (config.modalFocusBackId) {
+  //       let contentFocus = findById(config.modalFocusBackId)
+  //       if (contentFocus) {
+  //         contentFocus.focus()
+  //       }
+  //     }
+  //   }
+
+  //   const $listModals = (node: Document = doc): any[] =>
+  //     [].slice.call(node.querySelectorAll("." + MODAL_JS_CLASS))
+
+  //   /**
+  //    * Build modals for a container
+  //    * @param  {Node} node Default document
+  //    */
+  //   const attach = (node = document, addListeners = true) => {
+  //     $listModals(node).forEach((modal_node) => {
+  //       let iLisible = Math.random().toString(32).slice(2, 12)
+  //       let wrapperBody = findById(WRAPPER_PAGE_JS)
+  //       let body = doc.querySelector("body")
+
+  //       modal_node.setAttribute("id", MODAL_ID_PREFIX + iLisible)
+  //       modal_node.setAttribute(ATTR_HASPOPUP, ATTR_HASPOPUP_VALUE)
+
+  //       if (wrapperBody === null) {
+  //         let wrapper = doc.createElement("DIV")
+  //         wrapper.setAttribute("id", WRAPPER_PAGE_JS)
+  //         wrapInner(body, wrapper)
+  //       }
+  //     })
+
+  //     if (addListeners) {
+  //       /* listeners */
+  //       ;["click", "keydown"].forEach((eventName) => {
+  //         doc.body.addEventListener(
+  //           eventName,
+  //           (e) => {
+  //             const keyboardEvent = e as Event & KeyboardEvent
+
+  //             const target = e.target as HTMLElement | null
+
+  //             // click on link modal
+  //             let parentModalLauncher = searchParent(target, MODAL_JS_CLASS)
+  //             if (
+  //               (hasClass(target, MODAL_JS_CLASS) === true ||
+  //                 parentModalLauncher !== "") &&
+  //               eventName === "click"
+  //             ) {
+  //               let body = doc.querySelector("body")
+  //               let modalLauncher: HTMLElement | null = parentModalLauncher
+  //                 ? findById(parentModalLauncher)
+  //                 : target
+  //               let modalPrefixClass =
+  //                 modalLauncher?.hasAttribute(MODAL_PREFIX_CLASS_ATTR) === true
+  //                   ? modalLauncher.getAttribute(MODAL_PREFIX_CLASS_ATTR) + "-"
+  //                   : ""
+  //               let modalText =
+  //                 modalLauncher?.hasAttribute(MODAL_TEXT_ATTR) === true
+  //                   ? modalLauncher.getAttribute(MODAL_TEXT_ATTR)
+  //                   : ""
+  //               let modalContentId =
+  //                 modalLauncher?.hasAttribute(MODAL_CONTENT_ID_ATTR) === true
+  //                   ? modalLauncher.getAttribute(MODAL_CONTENT_ID_ATTR)
+  //                   : ""
+  //               let modalDescribedById =
+  //                 modalLauncher?.hasAttribute(MODAL_DESCRIBEDBY_ID_ATTR) ===
+  //                 true
+  //                   ? modalLauncher.getAttribute(MODAL_DESCRIBEDBY_ID_ATTR)
+  //                   : ""
+  //               let modalTitle =
+  //                 modalLauncher?.hasAttribute(MODAL_TITLE_ATTR) === true
+  //                   ? modalLauncher.getAttribute(MODAL_TITLE_ATTR)
+  //                   : ""
+  //               let modalCloseText =
+  //                 modalLauncher?.hasAttribute(MODAL_CLOSE_TEXT_ATTR) === true
+  //                   ? modalLauncher.getAttribute(MODAL_CLOSE_TEXT_ATTR)
+  //                   : MODAL_OVERLAY_TXT
+  //               let modalCloseTitle =
+  //                 modalLauncher?.hasAttribute(MODAL_CLOSE_TITLE_ATTR) === true
+  //                   ? modalLauncher.getAttribute(MODAL_CLOSE_TITLE_ATTR)
+  //                   : modalCloseText
+  //               let modalCloseImgPath =
+  //                 modalLauncher?.hasAttribute(MODAL_CLOSE_IMG_ATTR) === true
+  //                   ? modalLauncher.getAttribute(MODAL_CLOSE_IMG_ATTR)
+  //                   : ""
+  //               let backgroundEnabled =
+  //                 modalLauncher?.hasAttribute(MODAL_DATA_BACKGROUND_ATTR) ===
+  //                 true
+  //                   ? modalLauncher.getAttribute(MODAL_DATA_BACKGROUND_ATTR)
+  //                   : ""
+  //               let modalGiveFocusToId =
+  //                 modalLauncher?.hasAttribute(MODAL_FOCUS_TO_ATTR) === true
+  //                   ? modalLauncher.getAttribute(MODAL_FOCUS_TO_ATTR)
+  //                   : ""
+
+  //               let wrapperBody = findById(WRAPPER_PAGE_JS)
+
+  //               // insert overlay
+  //               body?.insertAdjacentHTML(
+  //                 "beforeend",
+  //                 createOverlay({
+  //                   text: modalCloseTitle,
+  //                   backgroundEnabled: backgroundEnabled,
+  //                   prefixClass: modalPrefixClass,
+  //                 })
+  //               )
+
+  //               // insert modal
+  //               body?.insertAdjacentHTML(
+  //                 "beforeend",
+  //                 createModal({
+  //                   modalText: modalText,
+  //                   modalPrefixClass: modalPrefixClass,
+  //                   backgroundEnabled: modalContentId,
+  //                   modalTitle: modalTitle,
+  //                   modalCloseText: modalCloseText,
+  //                   modalCloseTitle: modalCloseTitle,
+  //                   modalCloseImgPath: modalCloseImgPath,
+  //                   modalContentId: modalContentId,
+  //                   modalDescribedById: modalDescribedById,
+  //                   modalFocusBackId: modalLauncher?.getAttribute("id") ?? null,
+  //                 })
+  //               )
+
+  //               // hide page
+  //               wrapperBody?.setAttribute(ATTR_HIDDEN, "true")
+
+  //               // add class noscroll to body
+  //               addClass(body, NO_SCROLL_CLASS)
+
+  //               // give focus to close button or specified element
+  //               let closeButton = findById(MODAL_BUTTON_JS_ID)
+  //               if (modalGiveFocusToId) {
+  //                 let focusTo = findById(modalGiveFocusToId)
+  //                 if (focusTo) {
+  //                   focusTo.focus()
+  //                 } else {
+  //                   closeButton?.focus()
+  //                 }
+  //               } else {
+  //                 closeButton?.focus()
+  //               }
+
+  //               e.preventDefault()
+  //             }
+
+  //             // click on close button or on overlay not blocked
+  //             let parentButton = searchParent(target, MODAL_BUTTON_JS_CLASS)
+  //             if (
+  //               (target?.getAttribute("id") === MODAL_BUTTON_JS_ID ||
+  //                 parentButton !== "" ||
+  //                 target?.getAttribute("id") === MODAL_OVERLAY_ID ||
+  //                 hasClass(target, MODAL_BUTTON_JS_CLASS) === true) &&
+  //               eventName === "click"
+  //             ) {
+  //               let body = doc.querySelector("body")
+  //               let wrapperBody = findById(WRAPPER_PAGE_JS)
+  //               let modal = findById(MODAL_JS_ID)
+  //               let modalContent = findById(MODAL_CONTENT_JS_ID)
+  //                 ? findById(MODAL_CONTENT_JS_ID)?.innerHTML
+  //                 : ""
+  //               let overlay = findById(MODAL_OVERLAY_ID)
+  //               let modalButtonClose = findById(MODAL_BUTTON_JS_ID)
+  //               let modalFocusBackId = modalButtonClose?.getAttribute(
+  //                 MODAL_BUTTON_FOCUS_BACK_ID
+  //               )
+  //               let contentBackId = modalButtonClose?.getAttribute(
+  //                 MODAL_BUTTON_CONTENT_BACK_ID
+  //               )
+  //               let backgroundEnabled = overlay?.getAttribute(
+  //                 MODAL_OVERLAY_BG_ENABLED_ATTR
+  //               )
+
+  //               if (
+  //                 !(
+  //                   target?.getAttribute("id") === MODAL_OVERLAY_ID &&
+  //                   backgroundEnabled === "disabled"
+  //                 )
+  //               ) {
+  //                 closeModal({
+  //                   modal,
+  //                   modalContent,
+  //                   overlay,
+  //                   modalFocusBackId,
+  //                   contentBackId,
+  //                   backgroundEnabled,
+  //                   fromId: target?.getAttribute("id"),
+  //                 })
+
+  //                 // show back page
+  //                 wrapperBody?.removeAttribute(ATTR_HIDDEN)
+
+  //                 // remove class noscroll to body
+  //                 removeClass(body, NO_SCROLL_CLASS)
+  //               }
+  //             }
+
+  //             // strike a key when modal opened
+  //             if (findById(MODAL_JS_ID) && eventName === "keydown") {
+  //               let body = doc.querySelector("body")
+  //               let wrapperBody = findById(WRAPPER_PAGE_JS)
+  //               let modal = findById(MODAL_JS_ID)
+  //               let modalContent = findById(MODAL_CONTENT_JS_ID)
+  //                 ? findById(MODAL_CONTENT_JS_ID)?.innerHTML
+  //                 : ""
+  //               let overlay = findById(MODAL_OVERLAY_ID)
+  //               let modalButtonClose = findById(MODAL_BUTTON_JS_ID)
+  //               let modalFocusBackId = modalButtonClose?.getAttribute(
+  //                 MODAL_BUTTON_FOCUS_BACK_ID
+  //               )
+  //               let contentBackId = modalButtonClose?.getAttribute(
+  //                 MODAL_BUTTON_CONTENT_BACK_ID
+  //               )
+  //               let $listFocusables = [
+  //                 ...((modal?.querySelectorAll(
+  //                   FOCUSABLE_ELEMENTS_STRING
+  //                 ) as NodeListOf<HTMLElement>) ?? []),
+  //               ]
+
+  //               // esc
+  //               if (keyboardEvent.code === "Escape") {
+  //                 closeModal({
+  //                   modal,
+  //                   modalContent,
+  //                   overlay,
+  //                   modalFocusBackId,
+  //                   contentBackId,
+  //                   backgroundEnabled: undefined,
+  //                   fromId: undefined,
+  //                 })
+
+  //                 // show back page
+  //                 wrapperBody?.removeAttribute(ATTR_HIDDEN)
+
+  //                 // remove class noscroll to body
+  //                 removeClass(body, NO_SCROLL_CLASS)
+  //               }
+
+  //               // tab or Maj Tab in modal => capture focus
+  //               if (
+  //                 keyboardEvent.code === "Tab" &&
+  //                 target &&
+  //                 $listFocusables?.indexOf(target) >= 0
+  //               ) {
+  //                 // maj-tab on first element focusable => focus on last
+  //                 if (keyboardEvent.shiftKey) {
+  //                   if (target === $listFocusables[0]) {
+  //                     $listFocusables[$listFocusables.length - 1].focus()
+  //                     e.preventDefault()
+  //                   }
+  //                 } else {
+  //                   // tab on last element focusable => focus on first
+  //                   if (
+  //                     target === $listFocusables[$listFocusables.length - 1]
+  //                   ) {
+  //                     $listFocusables[0].focus()
+  //                     e.preventDefault()
+  //                   }
+  //                 }
+  //               }
+
+  //               // tab outside modal => put it in focus
+  //               if (
+  //                 keyboardEvent.code === "Tab" &&
+  //                 target &&
+  //                 $listFocusables.indexOf(target) === -1
+  //               ) {
+  //                 e.preventDefault()
+  //                 $listFocusables[0].focus()
+  //               }
+  //             }
+  //           },
+  //           true
+  //         )
+  //       })
+  //     }
+  //   }
+
+  //   const onLoad = () => {
+  //     attach()
+  //     document.removeEventListener("DOMContentLoaded", onLoad)
+  //   }
+
+  //   document.addEventListener("DOMContentLoaded", onLoad)
+
+  //   window.van11yAccessibleModalWindowAria = attach
+  // })(document)
+</script>
+
+<x-modal
+  data-initial-modal-classes={initialModalClasses}
+  data-initial-panel-classes={initialPanelClasses}
+  data-background-click={backgroundClick ? "enabled" : "disabled"}
+  data-target={target}
+  data-closing-delay={closingDelay}
+>
+  <slot />
+</x-modal>

@@ -1,0 +1,365 @@
+<script>
+  import type { Cart, ProductItems } from "@/api/types"
+  import CustomModal from "@/lib/classes/CustomModal"
+  import range from "@/lib/utils/range"
+  import $cart from "@/stores/cart"
+  import $cartOpen from "@/stores/modals/cart"
+
+  class CartModal extends CustomModal {
+    emptyCartEl: HTMLElement | null
+    cartItemsWrapper: HTMLElement | null
+    constructor() {
+      super()
+      $cartOpen.subscribe((open) => {
+        open ? this.openCartModal($cart.value) : this.closeModal()
+      })
+
+      $cart.subscribe((cart) => {
+        this.setCartItems(cart ?? null)
+      })
+
+      this.emptyCartEl = document.createElement("div")
+      this.emptyCartEl.classList.add("text-gray-600", "h-full")
+      this.emptyCartEl.innerHTML = `
+        <div class=" font-bold">Your cart is empty...</div>
+        <div class="mt-8 h-full">
+          <a
+            href="/products"
+            class="text-gray-800 h-full transition hover:text-accent font-bold flex justify-center items-center"
+
+          >
+            Visit our shop!
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-accent ml-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      `
+
+      this.cartItemsWrapper = document.getElementById(
+        "cart-modal-items-wrapper"
+      )
+      this.cartItemsWrapper?.replaceChildren(this.emptyCartEl)
+
+      // close modal when close button clicked
+      const closeButton = document.getElementById("cart-modal-close-button")
+      closeButton?.addEventListener("click", () => {
+        this.closeModal()
+      })
+    }
+
+    public buildCartItem(lineItem: ProductItems[0] | null | undefined) {
+      const product =
+        typeof lineItem?.product === "object" ? lineItem.product : null
+      const quantity = lineItem?.quantity
+
+      const firstCategory =
+        product && (product.categories?.length ?? 0) > 0
+          ? product.categories?.at(0)
+          : null
+
+      const categorySlug =
+        typeof firstCategory === "object" ? firstCategory?.slug : null
+
+      const price = lineItem?.totals?.formatted?.total
+
+      const quantityAvailable = product?.manageStock ? product.stock : 9999
+
+      const setThumbnail = () => {
+        const imageClasses =
+          "w-16 max-h-16 md:w-24 md:max-h-24 border border-gray-200 rounded overflow-hidden"
+
+        const wcImage =
+          product?.wc?.images && (product.wc.images.length ?? 0) > 0
+            ? product.wc?.images[0]
+            : null
+
+        if (typeof product?.featuredImage === "object") {
+          const featuredImage = product.featuredImage
+          // create image element from featuredImage
+          const img = document.createElement("img")
+          img.src = featuredImage.url ?? ""
+          img.alt = featuredImage.alt ?? ""
+          img.width = featuredImage.width ?? 0
+          img.height = featuredImage.height ?? 0
+          img.className = imageClasses
+
+          thumbnail?.appendChild(img)
+        } else if (wcImage) {
+          // create image element from wcImage
+          const img = document.createElement("img")
+          img.src = wcImage.src ?? ""
+          img.alt = wcImage.alt ?? ""
+          img.width = 100
+          img.height = 100
+          img.className = imageClasses
+
+          thumbnail?.appendChild(img)
+        }
+      }
+
+      const setLink = () => {
+        if (titleLink) {
+          titleLink.setAttribute(
+            "href",
+            `/products/${categorySlug}/${product?.slug}`
+          )
+          titleLink.text = product?.title ?? ""
+        }
+      }
+
+      const setQuantitySelector = () => {
+        if ((quantityAvailable ?? 0) > 1) {
+          const label = document.createElement("label")
+          label.className = "sr-only"
+          label.textContent = `Quantity, ${product?.title}`
+
+          const select = document.createElement("select")
+          select.id = `quantity-${product?.id}`
+          select.name = `quantity-${product?.id}`
+          select.value = quantity?.toString() ?? "1"
+          select.className =
+            "max-w-full rounded-md border border-gray-300 text-left text-base font-medium leading-5 text-gray-700 \
+            shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent sm:text-sm cursor-pointer"
+
+          range(1, Math.min(10, quantityAvailable ?? 9999)).forEach(
+            (num, i) => {
+              const option = document.createElement("option")
+              option.value = num.toString()
+              option.textContent = num.toString()
+              select.appendChild(option)
+            }
+          )
+
+          return { label, select }
+        }
+      }
+
+      const setPrice = () => {
+        if (priceEl && price !== "$0.00") {
+          priceEl.className = "text-sm text-gray-700 mr-4"
+          priceEl.textContent = price ?? ""
+        }
+      }
+
+      const cartItem = document.createElement("li")
+      cartItem.className = "py-6 flex items-center justify-between"
+      const thumbnail = document.createElement("div")
+      thumbnail.className =
+        "relative mr-4 w-16 h-16 md:w-24 md:h-24 flex justify-center items-center"
+      setThumbnail()
+      const content = document.createElement("div")
+      content.className = "w-full h-full flex flex-col justify-center"
+
+      const title = document.createElement("h3")
+      const titleLink = document.createElement("a")
+      titleLink.className =
+        "font-bold text-sm text-gray-900 hover:text-accent transition-colors"
+      setLink()
+      title.appendChild(titleLink)
+
+      // <div className="flex justify-between items-center mt-4">
+      const quantityWrapper = document.createElement("div")
+      quantityWrapper.className = "flex justify-between items-center mt-4"
+
+      const quantityEls = setQuantitySelector()
+      quantityEls?.label && quantityWrapper.appendChild(quantityEls.label)
+      quantityEls?.select && quantityWrapper.appendChild(quantityEls.select)
+
+      const priceEl = document.createElement("p")
+      priceEl.className = "text-sm text-gray-700 mr-4"
+      setPrice()
+      quantityWrapper.appendChild(priceEl)
+
+      const remove = document.createElement("div")
+      remove.className = ""
+      const xmlns = "http://www.w3.org/2000/svg"
+      const removeIcon = document.createElementNS(xmlns, "svg")
+      removeIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+      removeIcon.setAttribute("viewBox", "0 0 20 20")
+      removeIcon.setAttribute("fill", "currentColor")
+      removeIcon.setAttribute("aria-hidden", "true")
+      removeIcon.setAttribute(
+        "class",
+        "text-gray-500 hover:text-red-600 transition-colors h-6 cursor-pointer"
+      )
+
+      const removeIconTitle = document.createElementNS(xmlns, "title")
+      removeIconTitle.textContent = "Remove"
+      removeIcon.appendChild(removeIconTitle)
+
+      const removePath = document.createElementNS(xmlns, "path")
+      removePath.setAttribute("fill-rule", "evenodd")
+      removePath.setAttribute(
+        "d",
+        "M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z"
+      )
+      removePath.setAttribute("clip-rule", "evenodd")
+      removeIcon.appendChild(removePath)
+
+      remove.appendChild(removeIcon)
+
+      content.appendChild(title)
+      content.appendChild(quantityWrapper)
+      cartItem.appendChild(thumbnail)
+      cartItem.appendChild(content)
+      cartItem.appendChild(remove)
+      return cartItem
+    }
+
+    setCartItems(cart: Cart | null) {
+      const cartItemsWrapper = document.getElementById(
+        "cart-modal-items-wrapper"
+      )
+      if (this.cartItemsWrapper) {
+        if (cart?.items && cart.items.length > 0) {
+          const ulEl = document.createElement("ul")
+          ulEl.setAttribute("role", "list")
+          ulEl.className = "-my-6 divide-y divide-gray-200"
+
+          cart.items.forEach((lineItem) => {
+            const cartItem = this.buildCartItem(lineItem)
+            ulEl.appendChild(cartItem)
+          })
+
+          this.cartItemsWrapper.replaceChildren(ulEl)
+        } else {
+          this.emptyCartEl &&
+            this.cartItemsWrapper.replaceChildren(this.emptyCartEl)
+        }
+      }
+    }
+
+    openCartModal(cart: Cart | null | undefined) {
+      super.openModal()
+    }
+
+    closeModal = () =>
+      super.closeModal(() => {
+        $cartOpen.set(false)
+      })
+  }
+
+  customElements.define("cart-modal", CartModal)
+</script>
+
+<cart-modal
+  id="cart-modal"
+  data-initial-panel-classes="fixed inset-y-0 right-0 max-w-[350px] sm:max-w-lg md:max-w-full flex translate-x-full \
+  transform transition-all ease-in-out duration-300"
+  data-target="cart-modal-overlay"
+  data-background-click="enabled"
+>
+  <dialog id="cart-modal-overlay" hidden>
+    <div
+      id="cart-modal-panel"
+      class="fixed inset-y-0 right-0 max-w-[350px] sm:max-w-lg md:max-w-full flex translate-x-0 focus:ring-0 focus:outline-none \
+      transform transition-all ease-in-out duration-300"
+    >
+      <div class="w-screen max-w-md relative">
+        <div
+          class="flex flex-col justify-between h-full rounded-l bg-white shadow-xl overflow-y-scroll"
+        >
+          <div class="flex-1 py-6 overflow-y-auto px-4 sm:px-6">
+            <div class="flex items-start justify-between">
+              <h3 class="text-lg font-extrabold text-gray-900">
+                Shopping Cart
+              </h3>
+              <div class="ml-3 h-7 flex items-center">
+                <button
+                  id="cart-modal-close-button"
+                  type="button"
+                  title="Close cart"
+                  class="-m-2 p-2 text-gray-400 hover:text-red-main outline-none ring-transparent"
+                >
+                  <span class="sr-only">Close cart</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-6 h-6"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    >
+                    </path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-8 h-full">
+              <div class="h-full" id="cart-modal-items-wrapper">
+                <!-- {cart?.items && cart.items.length > 0 ? (
+                    <ul
+                      role="list"
+                      class="-my-6 divide-y divide-gray-200"
+                    >
+                      {cart.items.map((lineItem) => (
+                        <CartItem
+                          lineItem={lineItem}
+                          setOpen={setOpen}
+                          removeFromCart={removeItem}
+                          setCartLoading={setLoading}
+                        />
+                      ))}
+                    </ul>
+                  ) : (
+                    
+                  )} -->
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="cart-modal-footer"
+            class="border-t border-gray-200 py-6 px-4 sm:px-6"
+          >
+            <!-- {
+              cart?.totals?.formatted?.subTotal !== "$0.00" && (
+                <div class="flex justify-between text-base font-medium text-gray-500">
+                  <p>Subtotal</p>
+                  <p>{cart?.totals?.formatted?.subTotal}</p>
+                </div>
+              )
+            } -->
+            <div class="mt-2">
+              <a
+                href="/checkout"
+                title="Checkout"
+                class="flex w-full justify-center items-center px-6 py-3 border border-transparent
+                  rounded shadow-sm text-base font-medium text-white bg-accent hover:bg-highlight transition-colors"
+              >
+                Checkout
+              </a>
+            </div>
+            <div
+              class="mt-6 flex justify-center text-sm text-center text-gray-500"
+            >
+              <button
+                type="button"
+                class="text-red-600 font-medium hover:text-highlight transition-colors"
+              >
+                Clear Cart &nbsp;
+              </button>
+              <p>
+                or
+                <button
+                  type="button"
+                  class="text-accent font-medium hover:text-highlight transition-colors"
+                >
+                  Continue Shopping
+                  <span aria-hidden="true">&rarr;</span>
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</cart-modal>

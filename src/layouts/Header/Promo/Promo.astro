@@ -1,0 +1,55 @@
+---
+interface Props {
+  className: string
+  id: string
+}
+
+const { className, id } = Astro.props
+---
+
+<div class={`bg-accent ${className}`} {id}>
+  <div
+    class="h-10 px-4 flex items-center justify-center md:justify-end text-white"
+  >
+    <div
+      class="hidden md:block h-6 w-6 mr-6 mt-1 hover:text-red-400 transition-colors"
+      title="Visit our YouTube Channel"
+    >
+      <a
+        href="https://www.youtube.com/channel/UCxmKm_9iLJ2skg39mmoKYnA"
+        aria-label="Visit our YouTube Channel"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 576 512"
+          fill="currentColor"
+        >
+          <path
+            d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"
+          >
+          </path>
+        </svg>
+      </a>
+    </div>
+    <a
+      href="tel:+1-855-928-9904"
+      class="flex hover:text-highlight transition-colors"
+    >
+      <svg
+        class="h-6 w-6 mr-2"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 256 256"
+      >
+        <path
+          fill="currentColor"
+          d="m224 154.8l-47.09-21.11l-.18-.08a19.94 19.94 0 0 0-19 1.75a13.08 13.08 0 0 0-1.12.84l-22.31 19c-13-7.05-26.43-20.37-33.49-33.21l19.06-22.66a11.76 11.76 0 0 0 .85-1.15a20 20 0 0 0 1.66-18.83a1.42 1.42 0 0 1-.08-.18L101.2 32a20.06 20.06 0 0 0-20.78-11.85A60.27 60.27 0 0 0 28 80c0 81.61 66.39 148 148 148a60.27 60.27 0 0 0 59.85-52.42A20.06 20.06 0 0 0 224 154.8ZM176 204A124.15 124.15 0 0 1 52 80a36.29 36.29 0 0 1 28.48-35.54l18.82 42l-19.16 22.82a12 12 0 0 0-.86 1.16A20 20 0 0 0 78 130.08c9.42 19.28 28.83 38.56 48.31 48a20 20 0 0 0 19.69-1.45a11.63 11.63 0 0 0 1.11-.85l22.43-19.07l42 18.81A36.29 36.29 0 0 1 176 204Z"
+        >
+        </path>
+      </svg>
+
+      <span>+1 (855) 928-9904</span>
+    </a>
+  </div>
+</div>

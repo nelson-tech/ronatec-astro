@@ -1,0 +1,71 @@
+---
+import Promo from "./Promo"
+---
+
+<script>
+  let offset = 5
+
+  let scrollDirection: "up" | "down" | null = null
+  let atTop = true
+
+  let lastScrollY = window.scrollY
+
+  let stickyHeader = document.getElementById("sticky-header")
+  let promoBanner = document.getElementById("promo-banner")
+
+  function handleWheel(event: WheelEvent) {
+    const scrollY = window.scrollY
+    const direction = scrollY > lastScrollY ? "down" : "up"
+
+    scrollY < 1 && (atTop = true)
+    scrollY > 40 && (atTop = false)
+    if (
+      direction !== scrollDirection &&
+      (scrollY - lastScrollY > offset || scrollY - lastScrollY < -offset)
+    ) {
+      scrollDirection = direction
+    }
+    lastScrollY = scrollY > 0 ? scrollY : 0
+
+    if (stickyHeader) {
+      // Set sticky styling
+      if (scrollDirection === "down") {
+        console.log("replacing")
+        stickyHeader.classList.replace("top-0", "-top-20")
+      } else {
+        stickyHeader.classList.replace("-top-20", "top-0")
+      }
+    }
+
+    if (promoBanner) {
+      // Set promo styling
+      if (atTop) {
+        promoBanner.classList.replace("-translate-y-10", "translate-y-0")
+        promoBanner.classList.replace("h-0", "h-10")
+      } else {
+        promoBanner.classList.replace("translate-y-0", "-translate-y-10")
+        promoBanner.classList.replace("h-10", "h-0")
+      }
+    }
+  }
+  window.addEventListener("wheel", handleWheel)
+  document.addEventListener("astro:page-load", () => {
+    stickyHeader = document.getElementById("sticky-header")
+    promoBanner = document.getElementById("promo-banner")
+  })
+</script>
+
+<header
+  class="z-40 sticky transition-all ease-out top-0 duration-300"
+  id="sticky-header"
+>
+  <nav aria-label="Top" class="bg-white border-b border-gray-200">
+    <div class="relative">
+      <Promo
+        id="promo-banner"
+        className="transition-all h-10 duration-300 ease-out translate-y-0"
+      />
+    </div>
+    <slot />
+  </nav>
+</header>

@@ -1,0 +1,171 @@
+---
+import Dropdown from "@/components/Dropdown/Dropdown.astro"
+---
+
+<script>
+  import $userAuth from "@/stores/user/auth"
+  import $loginOpen from "@/stores/modals/login"
+  import logout from "@/api/utils/logout"
+
+  let profileButton = document.getElementById("profile-button")
+  let guestMenu = document.getElementById("guest-menu")
+  let authMenu = document.getElementById("auth-menu")
+  let loginButton = document.getElementById("login-button")
+  let logoutButton = document.getElementById("logout-button")
+
+  document.addEventListener("astro:page-load", () => {
+    profileButton = document.getElementById("profile-button")
+    guestMenu = document.getElementById("guest-menu")
+    authMenu = document.getElementById("auth-menu")
+    loginButton = document.getElementById("login-button")
+    logoutButton = document.getElementById("logout-button")
+
+    loginButton?.addEventListener("click", () => {
+      $loginOpen.set(true)
+    })
+
+    logoutButton?.addEventListener("click", logout)
+
+    $userAuth.subscribe((loggedIn) => {
+      if (loggedIn) {
+        profileButton?.classList.replace("text-gray-400", "text-highlight")
+        guestMenu?.classList.add("hidden")
+        authMenu?.classList.remove("hidden")
+      } else {
+        profileButton?.classList.replace("text-highlight", "text-gray-400")
+        authMenu?.classList.add("hidden")
+        guestMenu?.classList.remove("hidden")
+      }
+    })
+  })
+</script>
+
+<Dropdown id="user-menu">
+  <button
+    id="profile-button"
+    class="font-bold text-sm rounded py-2 outline-none text-gray-400 hover:text-gray-500 transition-colors duration-500"
+    slot="button"
+  >
+    <span class="sr-only">Open user menu</span>
+    <div class="h-6 w-6">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+        >
+        </path>
+      </svg>
+    </div>
+  </button>
+
+  <div class="hidden lg:block relative lg:flex-shrink-0 h-full" slot="panel">
+    <div class="z-20 absolute -right-[5.25rem] pt-2 w-48">
+      <div
+        class="rounded bg-white outline-none overflow-hidden shadow-lg ring-1 ring-black ring-opacity-5 z-20"
+      >
+        <!-- {loggedIn ? "Auth" : "Guest"} -->
+        <div id="guest-menu">
+          <button
+            id="login-button"
+            class="w-full transition cursor-pointer flex items-center outline-none ring-transparent text-highlight px-4 py-2 text-sm hover:bg-highlight hover:text-white"
+          >
+            <span class="h-4 w-4 mr-1.5">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                >
+                </path>
+              </svg>
+            </span>
+            <div class="target">Log in</div>
+          </button>
+
+          <a
+            href="/register"
+            class="transition group flex items-center text-accent-dark outline-none ring-transparent px-3.5 py-2 text-sm hover:bg-accent hover:text-white"
+          >
+            <div class="h-4 w-4 mr-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75"
+                >
+                </path>
+              </svg>
+            </div>
+            <div class="target">Register</div>
+          </a>
+        </div>
+        <div id="auth-menu" class="hidden">
+          <a
+            href="/orders"
+            class="transition flex items-center hover:bg-blue-main outline-none ring-transparent hover:text-white text-blue-dark px-4 py-2 text-sm"
+          >
+            <span class="h-4 w-4 mr-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M7.875 14.25l1.214 1.942a2.25 2.25 0 001.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 011.872 1.002l.164.246a2.25 2.25 0 001.872 1.002h2.092a2.25 2.25 0 001.872-1.002l.164-.246A2.25 2.25 0 0116.954 9h4.636M2.41 9a2.25 2.25 0 00-.16.832V12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 01.382-.632l3.285-3.832a2.25 2.25 0 011.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0021.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 002.25 2.25z"
+                >
+                </path>
+              </svg>
+            </span>
+             Orders
+          </a>
+
+          <button
+            id="logout-button"
+            class="transition w-full flex cursor-pointer items-center outline-none ring-transparent text-red-main px-4 py-2 text-sm hover:bg-red-main hover:text-white"
+          >
+            <span class="h-4 w-4 mr-1.5">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12.75 15l3-3m0 0l-3-3m3 3h-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                >
+                </path>
+              </svg>
+            </span>
+            <span class="target">Sign out</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</Dropdown>
