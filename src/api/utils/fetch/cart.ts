@@ -1,8 +1,8 @@
 import type { Cart, User } from "@/api/types"
 import $user from "@/stores/user"
 
-const fetchCart = async (givenUser?: User) => {
-  const user = $user.get() ?? givenUser
+const fetchCart = async (givenUser?: User | null) => {
+  const user = givenUser ?? $user.get()
 
   const userCart = user?.cart
   const userCartId = typeof userCart === "string" ? userCart : userCart?.id
