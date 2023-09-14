@@ -1,5 +1,6 @@
 <script>
   import type { Cart, ProductItems } from "@/api/types"
+  import updateCart from "@/api/utils/updateCart"
   import CustomModal from "@/lib/classes/CustomModal"
   import range from "@/lib/utils/range"
   import $cart from "@/stores/cart"
@@ -8,6 +9,7 @@
   class CartModal extends CustomModal {
     emptyCartEl: HTMLElement | null
     cartItemsWrapper: HTMLElement | null
+
     constructor() {
       super()
       $cartOpen.subscribe((open) => {
@@ -39,12 +41,22 @@
       this.cartItemsWrapper = document.getElementById(
         "cart-modal-items-wrapper"
       )
-      this.cartItemsWrapper?.replaceChildren(this.emptyCartEl)
+      ;($cart.get()?.count ?? 0) < 1
+        ? this.cartItemsWrapper?.replaceChildren(this.emptyCartEl)
+        : this.setCartItems($cart.get())
 
-      // close modal when close button clicked
+      // close modal when close button or continue shopping button is clicked
       const closeButton = document.getElementById("cart-modal-close-button")
-      closeButton?.addEventListener("click", () => {
-        this.closeModal()
+      closeButton?.addEventListener("click", this.closeModal)
+      const continueShoppingButton = document.getElementById(
+        "cart-modal-continue-shopping"
+      )
+      continueShoppingButton?.addEventListener("click", this.closeModal)
+
+      // clear cart when clear cart button is clicked
+      const clearCartButton = document.getElementById("cart-modal-clear-cart")
+      clearCartButton?.addEventListener("click", () => {
+        updateCart({ items: [] })
       })
     }
 
@@ -207,10 +219,7 @@
       return cartItem
     }
 
-    setCartItems(cart: Cart | null) {
-      const cartItemsWrapper = document.getElementById(
-        "cart-modal-items-wrapper"
-      )
+    setCartItems(cart: Cart | null | undefined) {
       if (this.cartItemsWrapper) {
         if (cart?.items && cart.items.length > 0) {
           const ulEl = document.createElement("ul")
@@ -227,6 +236,15 @@
           this.emptyCartEl &&
             this.cartItemsWrapper.replaceChildren(this.emptyCartEl)
         }
+      }
+
+      // set subtotals if subtotal !== $0.00
+      const subtotalEl = document.getElementById("cart-modal-subtotal")
+      if (subtotalEl && cart?.totals?.formatted?.subTotal !== "$0.00") {
+        subtotalEl.innerHTML = `
+          <p>Subtotal</p>
+          <p>${cart?.totals?.formatted?.subTotal}</p>
+        `
       }
     }
 
@@ -293,25 +311,7 @@
             </div>
 
             <div class="mt-8 h-full">
-              <div class="h-full" id="cart-modal-items-wrapper">
-                <!-- {cart?.items && cart.items.length > 0 ? (
-                    <ul
-                      role="list"
-                      class="-my-6 divide-y divide-gray-200"
-                    >
-                      {cart.items.map((lineItem) => (
-                        <CartItem
-                          lineItem={lineItem}
-                          setOpen={setOpen}
-                          removeFromCart={removeItem}
-                          setCartLoading={setLoading}
-                        />
-                      ))}
-                    </ul>
-                  ) : (
-                    
-                  )} -->
-              </div>
+              <div class="h-full" id="cart-modal-items-wrapper"></div>
             </div>
           </div>
 
@@ -319,14 +319,11 @@
             id="cart-modal-footer"
             class="border-t border-gray-200 py-6 px-4 sm:px-6"
           >
-            <!-- {
-              cart?.totals?.formatted?.subTotal !== "$0.00" && (
-                <div class="flex justify-between text-base font-medium text-gray-500">
-                  <p>Subtotal</p>
-                  <p>{cart?.totals?.formatted?.subTotal}</p>
-                </div>
-              )
-            } -->
+            <div
+              id="cart-modal-subtotal"
+              class="flex justify-between text-base font-medium text-gray-500"
+            >
+            </div>
             <div class="mt-2">
               <a
                 href="/checkout"
@@ -342,6 +339,7 @@
             >
               <button
                 type="button"
+                id="cart-modal-clear-cart"
                 class="text-red-600 font-medium hover:text-highlight transition-colors"
               >
                 Clear Cart &nbsp;
@@ -350,6 +348,7 @@
                 or
                 <button
                   type="button"
+                  id="cart-modal-continue-shopping"
                   class="text-accent font-medium hover:text-highlight transition-colors"
                 >
                   Continue Shopping
