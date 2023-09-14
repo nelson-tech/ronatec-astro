@@ -1,5 +1,6 @@
 <script>
   import type { Cart, ProductItems } from "@/api/types"
+  import mergeCartItems from "@/api/utils/mergeCartItems"
   import updateCart from "@/api/utils/updateCart"
   import CustomModal from "@/lib/classes/CustomModal"
   import range from "@/lib/utils/range"
@@ -64,6 +65,8 @@
       const product =
         typeof lineItem?.product === "object" ? lineItem.product : null
       const quantity = lineItem?.quantity
+
+      console.log("lineItem", product?.title, quantity?.toString() ?? "1")
 
       const firstCategory =
         product && (product.categories?.length ?? 0) > 0
@@ -130,6 +133,7 @@
           select.id = `quantity-${product?.id}`
           select.name = `quantity-${product?.id}`
           select.value = quantity?.toString() ?? "1"
+          select.setAttribute("aria-label", `Quantity, ${product?.title}`)
           select.className =
             "max-w-full rounded-md border border-gray-300 text-left text-base font-medium leading-5 text-gray-700 \
             shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent sm:text-sm cursor-pointer"
@@ -142,6 +146,8 @@
               select.appendChild(option)
             }
           )
+
+          select.selectedIndex = quantity ? quantity - 1 : 0
 
           return { label, select }
         }
@@ -176,7 +182,22 @@
 
       const quantityEls = setQuantitySelector()
       quantityEls?.label && quantityWrapper.appendChild(quantityEls.label)
-      quantityEls?.select && quantityWrapper.appendChild(quantityEls.select)
+      if (quantityEls?.select) {
+        quantityWrapper.appendChild(quantityEls.select)
+        quantityEls.select.addEventListener("change", (e) => {
+          const newQuantity = parseInt((e.target as HTMLSelectElement).value)
+
+          if (lineItem) {
+            const mergedItems = mergeCartItems({
+              newItems: [{ ...lineItem, quantity: newQuantity }],
+              existingItems: $cart.get()?.items ?? [],
+            })
+            updateCart({
+              items: mergedItems,
+            })
+          }
+        })
+      }
 
       const priceEl = document.createElement("p")
       priceEl.className = "text-sm text-gray-700 mr-4"
