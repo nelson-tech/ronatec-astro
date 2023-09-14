@@ -2,6 +2,7 @@
   import type { Cart, ProductItems } from "@/api/types"
   import mergeCartItems from "@/api/utils/mergeCartItems"
   import updateCart from "@/api/utils/updateCart"
+  import createLoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner"
   import CustomModal from "@/lib/classes/CustomModal"
   import range from "@/lib/utils/range"
   import $cart from "@/stores/cart"
@@ -65,8 +66,6 @@
       const product =
         typeof lineItem?.product === "object" ? lineItem.product : null
       const quantity = lineItem?.quantity
-
-      console.log("lineItem", product?.title, quantity?.toString() ?? "1")
 
       const firstCategory =
         product && (product.categories?.length ?? 0) > 0
@@ -176,15 +175,37 @@
       setLink()
       title.appendChild(titleLink)
 
-      // <div className="flex justify-between items-center mt-4">
       const quantityWrapper = document.createElement("div")
       quantityWrapper.className = "flex justify-between items-center mt-4"
 
       const quantityEls = setQuantitySelector()
       quantityEls?.label && quantityWrapper.appendChild(quantityEls.label)
-      if (quantityEls?.select) {
-        quantityWrapper.appendChild(quantityEls.select)
-        quantityEls.select.addEventListener("change", (e) => {
+      quantityEls?.label && quantityWrapper.appendChild(quantityEls.select)
+
+      const priceEl = document.createElement("p")
+      priceEl.className = "text-sm text-gray-700 mr-4"
+      setPrice()
+      quantityWrapper.appendChild(priceEl)
+
+      quantityEls?.label &&
+        quantityEls.select.addEventListener("change", (e: Event) => {
+          // disable select while updating cart
+          quantityEls.select.disabled = true
+
+          // change pointer class to default
+          quantityEls.select.classList.replace(
+            "cursor-pointer",
+            "cursor-default"
+          )
+
+          // replace price with loading spinner
+          const loadingSpinner = createLoadingSpinner({
+            className: "mr-4 text-gray-400",
+            size: 6,
+          })
+
+          priceEl.outerHTML = loadingSpinner.outerHTML
+
           const newQuantity = parseInt((e.target as HTMLSelectElement).value)
 
           if (lineItem) {
@@ -197,12 +218,6 @@
             })
           }
         })
-      }
-
-      const priceEl = document.createElement("p")
-      priceEl.className = "text-sm text-gray-700 mr-4"
-      setPrice()
-      quantityWrapper.appendChild(priceEl)
 
       const remove = document.createElement("div")
       remove.className = ""
