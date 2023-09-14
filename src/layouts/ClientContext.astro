@@ -18,18 +18,16 @@
       $authLoading.set(false)
     }
 
-    // fetch cart if undefined
-    if ($cart.get() === undefined) {
-      $cartLoading.set(true)
+    // fetch cart
+    $cartLoading.set(true)
 
-      const cartData = await fetchCart()
+    const cartData = await fetchCart()
 
-      // set cart
-      $cart.set(cartData)
+    // set cart
+    $cart.set(cartData)
 
-      $cartLoading.set(false)
-    }
+    $cartLoading.set(false)
   }
 
-  document.addEventListener("astro:page-load", load)
+  document.addEventListener("astro:page-load", load, { once: true })
 </script>
