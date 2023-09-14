@@ -247,6 +247,41 @@
 
       remove.appendChild(removeIcon)
 
+      // remove item when remove button is clicked
+      remove.addEventListener("click", () => {
+        const loadingSpinner = createLoadingSpinner({
+          className: "text-gray-400",
+          size: 6,
+        })
+
+        remove.replaceChildren(loadingSpinner)
+
+        const cartState = $cart.get()
+        if (cartState?.items) {
+          const filteredItems = cartState.items
+            .filter((item) => {
+              return (
+                (typeof item.product === "object"
+                  ? item.product.id
+                  : item.product) !== product?.id
+              )
+            })
+            .map(({ product, totals, title, quantity }: ProductItems[0]) => {
+              const formattedItem: ProductItems[0] = {
+                product: typeof product === "object" ? product.id : product,
+                totals,
+                title,
+                quantity,
+              }
+              return formattedItem
+            }) as ProductItems
+
+          updateCart({
+            items: filteredItems,
+          })
+        }
+      })
+
       content.appendChild(title)
       content.appendChild(quantityWrapper)
       cartItem.appendChild(thumbnail)
@@ -276,10 +311,11 @@
 
       // set subtotals if subtotal !== $0.00
       const subtotalEl = document.getElementById("cart-modal-subtotal")
-      if (subtotalEl && cart?.totals?.formatted?.subTotal !== "$0.00") {
+      const subTotal = cart?.totals?.formatted?.subTotal
+      if (subtotalEl && subTotal && subTotal !== "$0.00") {
         subtotalEl.innerHTML = `
           <p>Subtotal</p>
-          <p>${cart?.totals?.formatted?.subTotal}</p>
+          <p>${subTotal}</p>
         `
       }
     }
