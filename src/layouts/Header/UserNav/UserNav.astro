@@ -5,14 +5,14 @@ import ProfileMenu from "./ProfileMenu"
 ---
 
 <div class="flex-1 flex items-center justify-end">
-  <div class="flex items-center lg:ml-8">
+  <div class="flex items-center lg:ml-8" transition:persist>
     <SearchButton
       className="hidden lg:block -m-2 mr-6 p-2 w-10 h-10 text-gray-400 hover:text-gray-500 cursor-pointer"
     />
 
     <ProfileMenu />
     <div class="ml-4 flow-root lg:ml-8">
-      <CartButton transition:persist />
+      <CartButton />
     </div>
   </div>
 </div>
