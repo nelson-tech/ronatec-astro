@@ -7,13 +7,13 @@ import Dropdown from "@/components/Dropdown/Dropdown.astro"
   import $loginOpen from "@/stores/modals/login"
   import logout from "@/api/utils/logout"
 
-  let profileButton = document.getElementById("profile-button")
-  let guestMenu = document.getElementById("guest-menu")
-  let authMenu = document.getElementById("auth-menu")
-  let loginButton = document.getElementById("login-button")
-  let logoutButton = document.getElementById("logout-button")
-
   document.addEventListener("astro:page-load", () => {
+    let profileButton = document.getElementById("profile-button")
+    let guestMenu = document.getElementById("guest-menu")
+    let authMenu = document.getElementById("auth-menu")
+    let loginButton = document.getElementById("login-button")
+    let logoutButton = document.getElementById("logout-button")
+
     profileButton = document.getElementById("profile-button")
     guestMenu = document.getElementById("guest-menu")
     authMenu = document.getElementById("auth-menu")
