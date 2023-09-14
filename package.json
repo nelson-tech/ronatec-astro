@@ -15,6 +15,7 @@
     "@astrojs/svelte": "^4.0.2",
     "@astrojs/tailwind": "^5.0.0",
     "@floating-ui/dom": "^1.5.1",
+    "@nanostores/persistent": "^0.9.1",
     "astro": "^3.0.12",
     "nanostores": "^0.9.3",
     "sharp": "^0.32.5",

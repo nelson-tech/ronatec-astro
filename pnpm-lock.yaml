@@ -20,6 +20,9 @@ dependencies:
   '@floating-ui/dom':
     specifier: ^1.5.1
     version: 1.5.1
+  '@nanostores/persistent':
+    specifier: ^0.9.1
+    version: 0.9.1(nanostores@0.9.3)
   astro:
     specifier: ^3.0.12
     version: 3.0.12(@types/node@20.6.0)
