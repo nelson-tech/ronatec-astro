@@ -33,7 +33,7 @@ function createLoadingSpinner({
     "164.93361431346415 56.97787143782138"
   )
   circle.style.fill = "none"
-  circle.style.stroke = color ?? "#e15b64"
+  circle.style.stroke = color ?? "currentColor"
   circle.style.opacity = opacity ? `${opacity / 100}` : "1"
   svgElem.appendChild(circle)
 
