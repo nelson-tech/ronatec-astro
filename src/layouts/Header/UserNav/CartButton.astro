@@ -19,7 +19,7 @@
     // Update cart count
     const cartCountEl = document.getElementById("cart-count")
     if (cartCountEl) {
-      cartCountEl.textContent = $cartCount?.value?.toString() ?? "0"
+      cartCountEl.textContent = $cartCount?.get()?.toString() ?? "0"
       $cartCount.subscribe((count) => {
         cartCountEl.textContent = count.toString()
       })
