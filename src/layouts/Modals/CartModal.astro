@@ -26,7 +26,7 @@
       this.emptyCartEl.classList.add("text-gray-600", "h-full")
       this.emptyCartEl.innerHTML = `
         <div class=" font-bold">Your cart is empty...</div>
-        <div class="mt-8 h-full">
+        <div class="-mt-8 h-full">
           <a
             href="/products"
             class="text-gray-800 h-full transition hover:text-accent font-bold flex justify-center items-center"
@@ -50,16 +50,96 @@
       // close modal when close button or continue shopping button is clicked
       const closeButton = document.getElementById("cart-modal-close-button")
       closeButton?.addEventListener("click", this.closeModal)
-      const continueShoppingButton = document.getElementById(
-        "cart-modal-continue-shopping"
-      )
-      continueShoppingButton?.addEventListener("click", this.closeModal)
 
-      // clear cart when clear cart button is clicked
-      const clearCartButton = document.getElementById("cart-modal-clear-cart")
-      clearCartButton?.addEventListener("click", () => {
-        updateCart({ items: [] })
-      })
+      this.setFooter()
+    }
+
+    setFooter() {
+      const cart = $cart.get()
+      const footer = document.getElementById("cart-modal-footer")
+      if (footer) {
+        if ((cart?.items?.length ?? 0) < 1) {
+          // no footer for empty cart
+          footer.innerHTML = ""
+          footer.classList.remove("border-t")
+        } else if (footer) {
+          // set subtotals if subtotal !== $0.00 - clear otherwise
+          const subtotalEl = document.createElement("div")
+          subtotalEl.className =
+            "flex justify-between text-base font-medium text-gray-500"
+          const subTotal = cart?.totals?.formatted?.subTotal
+          if (subtotalEl && subTotal && subTotal !== "$0.00") {
+            subtotalEl.innerHTML = `
+          <p>Subtotal</p>
+          <p>${subTotal}</p>
+        `
+          } else if (subtotalEl) {
+            subtotalEl.innerHTML = ""
+          }
+          footer.innerHTML = `
+          ${subtotalEl.outerHTML}
+          <div class="mt-2">
+            <a
+              href="/checkout"
+              title="Checkout"
+              class="flex w-full justify-center items-center px-6 py-3 border border-transparent
+                rounded shadow-sm text-base font-medium text-white bg-accent hover:bg-highlight transition-colors"
+            >
+              Checkout
+            </a>
+          </div>
+          <div
+            id="cart-modal-footer-links"
+            class="pt-6 flex justify-center text-sm text-center text-gray-500"
+          >
+            <button
+              type="button"
+              id="cart-modal-clear-cart"
+              class="text-red-600 font-medium hover:text-highlight transition-colors"
+            >
+              Clear Cart &nbsp;
+            </button>
+            <p>
+              or
+              <button
+                type="button"
+                id="cart-modal-continue-shopping"
+                class="text-accent font-medium hover:text-highlight transition-colors"
+              >
+                Continue Shopping
+                <span aria-hidden="true">&rarr;</span>
+              </button>
+            </p>
+          </div>
+        `
+          footer.classList.add("border-t")
+          const clearCartButton = document.getElementById(
+            "cart-modal-clear-cart"
+          )
+          clearCartButton?.addEventListener("click", this.handleClearCart)
+
+          const continueShoppingButton = document.getElementById(
+            "cart-modal-continue-shopping"
+          )
+          continueShoppingButton?.addEventListener("click", this.closeModal)
+        }
+      }
+    }
+
+    async handleClearCart() {
+      const footerLinks = document.getElementById("cart-modal-footer-links")
+      if (footerLinks) {
+        footerLinks.classList.replace("pt-6", "pt-5")
+
+        const loadingSpinner = createLoadingSpinner({
+          className:
+            "text-gray-400 ml-[2.125rem] mr-6 relative h-4 [&_svg]:absolute ",
+          size: 6,
+        })
+        footerLinks.innerHTML = loadingSpinner.outerHTML
+
+        await updateCart({ items: [] })
+      }
     }
 
     public buildCartItem(lineItem: ProductItems[0] | null | undefined) {
@@ -309,25 +389,19 @@
         }
       }
 
-      // set subtotals if subtotal !== $0.00
-      const subtotalEl = document.getElementById("cart-modal-subtotal")
-      const subTotal = cart?.totals?.formatted?.subTotal
-      if (subtotalEl && subTotal && subTotal !== "$0.00") {
-        subtotalEl.innerHTML = `
-          <p>Subtotal</p>
-          <p>${subTotal}</p>
-        `
-      }
+      this.setFooter()
     }
 
     openCartModal(cart: Cart | null | undefined) {
       super.openModal()
     }
 
-    closeModal = () =>
+    closeModal() {
+      console.log("Closing cart modal")
       super.closeModal(() => {
         $cartOpen.set(false)
       })
+    }
   }
 
   customElements.define("cart-modal", CartModal)
@@ -407,7 +481,8 @@
               </a>
             </div>
             <div
-              class="mt-6 flex justify-center text-sm text-center text-gray-500"
+              id="cart-modal-footer-links"
+              class="pt-6 flex justify-center text-sm text-center text-gray-500"
             >
               <button
                 type="button"
