@@ -4,17 +4,13 @@ import Sticky from "./Sticky.astro"
 import MainMenu from "./MainMenu"
 import MobileNav from "./MobileNav"
 import UserNav from "./UserNav"
+import type { MainMenuLink } from "@/api/types"
 
-// import MobileMenuButton from "./buttons/MobileMenu"
-// import SearchButton from "./buttons/Search"
+type Props = {
+  menuItems: MainMenuLink | undefined
+}
 
-// const response = await fetch(import.meta.env.PUBLIC_API_BASE + "/globals/menus")
-
-// const menus = await response.json()
-
-const menus = await fetch(import.meta.env.PUBLIC_API_BASE + "/globals/menus")
-  .then((res) => res.json())
-  .catch((err) => console.error(err))
+const { menuItems } = Astro.props
 ---
 
 <Sticky>
@@ -29,7 +25,7 @@ const menus = await fetch(import.meta.env.PUBLIC_API_BASE + "/globals/menus")
       </a>
     </div>
 
-    <MainMenu menuItems={menus?.mainMenu.links} />
+    <MainMenu {menuItems} />
 
     {/* Mobile menu and search (lg-) */}
     <MobileNav />

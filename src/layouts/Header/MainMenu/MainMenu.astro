@@ -3,7 +3,7 @@ import type { MainMenuLink } from "@/api/types"
 import DropdownMenu from "./DropdownMenu"
 
 interface Props {
-  menuItems: MainMenuLink
+  menuItems: MainMenuLink | undefined
 }
 
 const { menuItems } = Astro.props

@@ -4,11 +4,19 @@ import ClientContext from "./ClientContext.astro"
 import Header from "./Header"
 import Modals from "./Modals"
 import Alerts from "./Alerts/Alerts.astro"
+import type { Menu } from "@/api/types"
 interface Props {
   title: string
 }
 
 const { title } = Astro.props
+
+const menus = await fetch(import.meta.env.PUBLIC_API_BASE + "/globals/menus")
+  .then((res) => res.json() as Promise<Menu>)
+  .catch((err) => {
+    console.error(err)
+    return null
+  })
 ---
 
 <!doctype html>
@@ -23,21 +31,25 @@ const { title } = Astro.props
     <ViewTransitions />
   </head>
   <body class="font-sans">
-    <Header />
+    <Header menuItems={menus?.mainMenu.links} />
     <div class="bg-white z-0" transition:animate="fade">
       <slot />
     </div>
     <ClientContext />
     <Modals />
     <Alerts />
-    <!-- <style>
+    {
+      /*
+    <style>
       @font-face {
         font-family: "Exo";
         src: url("/fonts/exo.woff2") format("woff");
         font-weight: 500;
         font-style: normal;
-        font-display: block;
+        font-display: swap;
       }
-    </style> -->
+    </style>
+    */
+    }
   </body>
 </html>
