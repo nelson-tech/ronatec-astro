@@ -7,15 +7,14 @@ const { className } = Astro.props
 ---
 
 <script>
-  import searchOpen from "@/stores/modals/search"
+  import $searchOpen from "@/stores/modals/search"
 
   class SearchButton extends HTMLElement {
     constructor() {
       super()
 
       this?.addEventListener("click", () => {
-        console.log("click")
-        searchOpen.set(true)
+        $searchOpen.set(true)
       })
     }
   }

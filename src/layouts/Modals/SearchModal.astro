@@ -1,0 +1,41 @@
+---
+import SearchForm from "@/components/SearchForm"
+---
+
+<script>
+  import CustomModal from "@/lib/classes/CustomModal"
+  import $searchOpen from "@/stores/modals/search"
+
+  class SearchModal extends CustomModal {
+    constructor() {
+      super()
+      $searchOpen.subscribe((open) => {
+        open ? this.openModal() : this.closeModal()
+      })
+    }
+
+    closeModal = () =>
+      super.closeModal(() => {
+        $searchOpen.set(false)
+      })
+  }
+
+  customElements.define("search-modal", SearchModal)
+</script>
+
+<search-modal
+  id="search-modal"
+  data-initial-panel-classes="opacity-0 transition-all duration-300 inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left bg-white align-middle shadow-xl rounded"
+  data-target="search-modal-overlay"
+  data-background-click="enabled"
+>
+  <dialog id="search-modal-overlay" hidden>
+    <div
+      id="search-modal-panel"
+      class="opacity-100 transition-all duration-300 inline-block w-full max-w-md p-6 my-8 \
+      overflow-hidden text-left bg-white align-middle shadow-xl rounded focus:outline-none"
+    >
+      <SearchForm />
+    </div>
+  </dialog>
+</search-modal>

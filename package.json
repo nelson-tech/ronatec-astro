@@ -17,7 +17,10 @@
     "@floating-ui/dom": "^1.5.1",
     "@nanostores/persistent": "^0.9.1",
     "astro": "^3.0.12",
+    "lodash": "^4.17.21",
+    "lodash.debounce": "^4.0.8",
     "nanostores": "^0.9.3",
+    "qs": "^6.11.2",
     "sharp": "^0.32.5",
     "svelte": "^4.0.0",
     "tailwindcss": "^3.0.24"
@@ -27,7 +30,10 @@
     "@skeletonlabs/tw-plugin": "^0.1.0",
     "@tailwindcss/forms": "^0.5.6",
     "@tsconfig/svelte": "^5.0.2",
+    "@types/lodash": "^4.14.198",
+    "@types/lodash.debounce": "^4.0.7",
     "@types/node": "^20.6.0",
+    "@types/qs": "^6.9.8",
     "bun-types": "^1.0.1",
     "prettier": "^3.0.3",
     "prettier-plugin-astro": "^0.12.0"

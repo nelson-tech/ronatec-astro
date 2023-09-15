@@ -1,0 +1,109 @@
+<script>
+  import type { Product } from "@/api/types"
+  import getSearchResults from "@/api/utils/fetch/searchResults"
+  import $searchLoading from "@/stores/loading/search"
+
+  class SearchForm extends HTMLElement {
+    constructor() {
+      super()
+
+      $searchLoading.subscribe((loading) => {
+        if (loading) {
+          this.classList.add("loading")
+        } else {
+          this.classList.remove("loading")
+        }
+      })
+
+      const searchInput = document.getElementById("search-input")
+
+      // handle searchField change
+      searchInput?.addEventListener("input", async (e) => {
+        e.preventDefault()
+        const search = (e.target as HTMLInputElement).value
+
+        const products = await getSearchResults(search)
+
+        this.setProducts(products)
+      })
+    }
+
+    setProducts(products: Product[] | null) {
+      const searchField = document.getElementById("search-field")
+      if ((products?.length ?? 0) < 1) {
+        // remove products list if exists
+        const productsList = document.getElementById(
+          "search-form-products-list"
+        )
+        if (productsList) {
+          productsList.remove()
+        }
+      } else {
+        const previousList = document.getElementById(
+          "search-form-products-list"
+        )
+        if (previousList) {
+          previousList.remove()
+        }
+        console.log("appending", searchField)
+        // create products list
+        const productsList = document.createElement("ul")
+        productsList.id = "search-form-products-list"
+        productsList.className =
+          "absolute z-10 mt-1 pt-2 max-h-60 w-full overflow-auto rounded bg-white text-base \
+                shadow-lg ring-transparent focus:outline-none sm:text-sm text-gray-600"
+        productsList.setAttribute("role", "listbox")
+        productsList.setAttribute("tabindex", "-1")
+        productsList.setAttribute("aria-labelledby", "listbox-label")
+        products?.forEach((product) => {
+          const firstCategory = product.categories?.at(0)
+          const categorySlug =
+            typeof firstCategory === "object" ? firstCategory.slug : ""
+
+          const productItem = document.createElement("li")
+          // `relative cursor-pointer select-none py-2 pl-8 pr-4 ring-transparent focus:outline-none
+          // ${active ? "bg-accent text-white" : "text-gray-900"}`
+          productItem.className =
+            "flex items-center select-none ring-transparent w-full h-full object-contain focus:outline-none"
+          productItem.setAttribute("role", "option")
+          productItem.setAttribute("aria-selected", "false")
+          productItem.setAttribute("tabindex", "-1")
+          productItem.setAttribute("id", product.id)
+          // insert link to product
+          const productLink = document.createElement("a")
+          productLink.href = `/products/${categorySlug}/${product.slug}`
+          productLink.className =
+            "hover:text-highlight w-full h-full hover:bg-gray-100 py-2 pl-8 pr-4 cursor-pointer"
+          productLink.textContent = product.title
+          productItem.appendChild(productLink)
+          productsList.appendChild(productItem)
+        })
+        searchField?.appendChild(productsList)
+      }
+    }
+  }
+
+  customElements.define("search-form", SearchForm)
+</script>
+
+<search-form class="inline-block my-6 w-full pb-60 text-left align-middle">
+  <div>
+    <h2 class="mb-6 text-center text-3xl font-extrabold text-gray-700">
+      Search Products
+    </h2>
+  </div>
+  <div class="h-fit">
+    <div id="search-field" class="relative mt-1">
+      <input
+        id="search-input"
+        class="w-full rounded border border-gray-300 bg-white py-2 pl-3 pr-10
+        ring-0 ring-transparent focus:ring-accent focus:border-accent focus:outline-none sm:text-sm"
+        placeholder="Product Name"
+      />
+      <button
+        class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 ring-transparent focus:outline-none"
+      >
+      </button>
+    </div>
+  </div>
+</search-form>
