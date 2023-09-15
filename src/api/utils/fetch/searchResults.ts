@@ -11,8 +11,6 @@ const fetchSearchResults = async (search: string) => {
     | null
     | undefined = await response.json()
 
-  console.log(productsData)
-
   return productsData?.docs ?? null
 }
 
