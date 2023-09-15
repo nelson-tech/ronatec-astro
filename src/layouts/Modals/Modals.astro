@@ -1,9 +1,18 @@
 ---
+import type { MobileMenuLink } from "@/api/types"
 import CartModal from "./CartModal.astro"
 import LoginModal from "./LoginModal.astro"
+import MobileMenuModal from "./MobileMenuModal.astro"
 import SearchModal from "./SearchModal.astro"
+
+type Props = {
+  mobileMenuItems: MobileMenuLink | undefined
+}
+
+const { mobileMenuItems } = Astro.props
 ---
 
 <CartModal />
 <LoginModal />
+<MobileMenuModal menuItems={mobileMenuItems} />
 <SearchModal />

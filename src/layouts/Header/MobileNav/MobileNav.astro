@@ -3,19 +3,19 @@ import SearchButton from "@/components/SearchButton"
 ---
 
 <script>
-  import mobileMenuOpen from "@/stores/mobileMenu"
+  import $mobileMenuOpen from "@/stores/modals/mobileMenu"
 
   const openMobileMenu = () => {
-    mobileMenuOpen.set(true)
+    $mobileMenuOpen.set(true)
   }
 
-  const mobileButton = document.getElementById("openMobileMenu")
+  const mobileButton = document.getElementById("mobile-menu-modal-open-button")
   mobileButton?.addEventListener("click", openMobileMenu)
 </script>
 
-<div class="flex-1 flex items-center lg:hidden">
+<div class="flex items-center">
   <button
-    id="openMobileMenu"
+    id="mobile-menu-modal-open-button"
     type="button"
     class="-ml-2 bg-white w-6 h-6 rounded text-gray-400"
   >

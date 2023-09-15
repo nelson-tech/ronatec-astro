@@ -4,14 +4,18 @@ import CartButton from "./CartButton.astro"
 import ProfileMenu from "./ProfileMenu"
 ---
 
-<div class="flex-1 flex items-center justify-end">
+<div class="flex items-center justify-end">
   <div class="flex items-center lg:ml-8" transition:persist>
-    <SearchButton
-      className="hidden lg:block -m-2 mr-6 p-2 w-10 h-10 text-gray-400 hover:text-gray-500 cursor-pointer"
-    />
+    <div
+      class="scale-0 max-w-0 lg:max-w-full lg:scale-100 flex items-center transition-transform ease-in"
+    >
+      <SearchButton
+        className="-m-2 mr-6 p-2 w-10 h-10 text-gray-400 hover:text-gray-500 cursor-pointer"
+      />
 
-    <ProfileMenu />
-    <div class="ml-4 flow-root lg:ml-8">
+      <ProfileMenu />
+    </div>
+    <div class="ml-4 lg:ml-8">
       <CartButton />
     </div>
   </div>

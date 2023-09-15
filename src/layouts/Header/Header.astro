@@ -17,24 +17,20 @@ const { menuItems } = Astro.props
   <div
     class="bg-white mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl h-16 flex items-center justify-between"
   >
-    {/* Logo (lg+) */}
-    <div class="hidden lg:block lg:items-center">
-      <a href="/" class="text-accent">
-        <span class="sr-only">Ronatec C2C, Inc.</span>
-        <Logo />
-      </a>
+    <div
+      class="scale-100 lg:max-w-0 lg:overflow-hidden lg:scale-0 transition-all"
+      transition:persist
+    >
+      <MobileNav />
     </div>
 
-    <MainMenu {menuItems} />
+    <Logo />
 
-    {/* Mobile menu and search (lg-) */}
-    <MobileNav />
-
-    {/* Logo (lg-) */}
-    <div class="lg:hidden">
-      <Logo />
+    <div
+      class="scale-0 absolute lg:relative lg:scale-100 transition-all lg:flex w-full justify-start"
+    >
+      <MainMenu {menuItems} />
     </div>
-
     <UserNav />
   </div>
 </Sticky>
